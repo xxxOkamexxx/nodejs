@@ -20,11 +20,16 @@
      res.send(`The current time is ${new Date()}`);
  })
  
+ //=====================================
  // Respond with a random oneliner joke
+ //=====================================
  app.get('/jokes', (req, res) => {
      // 1. Somehow read the JSON-contents of data/oneliners.json
      // 2. Get a random item from the array
      // 3. Respond with the item (`res.send(item)`)
+
+     const oneliner = require('./data/oneliners.json');
+     res.send(oneliner);
  });
  
  // Serve files from `/public` if no other route matches
