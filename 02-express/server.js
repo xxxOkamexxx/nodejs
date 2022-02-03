@@ -29,7 +29,8 @@
      // 3. Respond with the item (`res.send(item)`)
 
      const oneliner = require('./data/oneliners.json');
-     res.send(oneliner);
+     let item = oneliner[Math.floor(Math.random()*oneliner.length)] 
+     res.send(item);
  });
  
  // Serve files from `/public` if no other route matches
