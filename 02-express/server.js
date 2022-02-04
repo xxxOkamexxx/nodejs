@@ -3,11 +3,21 @@
  */
 
  const express = require('express');
+ const _ = require('lodash');
  const path = require('path');
  const morgan = require('morgan');
+ const oneliner = require('./data/oneliners.json');
  
  const app = express();
- const oneliner = require('./data/oneliners.json');
+ 
+ // tell express to use ejs as it's view engine
+ app.set('view engin','ejs');
+
+ // // Inject logic to all incoming requests
+// app.use((req, res, next) => {
+// 	console.log(`Incoming ${req.method} request for ${req.url}`);
+// 	next();
+// });
 
  //use morgan http request loggar
  app.use(morgan('dev'));
