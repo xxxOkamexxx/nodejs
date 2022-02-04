@@ -4,7 +4,14 @@
 
  const express = require('express');
  const path = require('path');
+ const morgan = require('morgan');
+ 
  const app = express();
+ const oneliner = require('./data/oneliners.json');
+
+ //use morgan http request loggar
+ app.use(morgan('dev'));
+ 
  
  // Respond to GET request for `/`
  app.get('/', (req, res) => {
@@ -28,7 +35,6 @@
      // 2. Get a random item from the array
      // 3. Respond with the item (`res.send(item)`)
 
-     const oneliner = require('./data/oneliners.json');
      let item = oneliner[Math.floor(Math.random()*oneliner.length)] 
      res.send(item);
  });
