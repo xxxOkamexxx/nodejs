@@ -13,14 +13,14 @@ const connection = knex({
     }
 });
 
-/*
+
 connection.select().table('PokemonCards').then((result) => { // SELECT * FROM PokemonCards 
     console.log(result);
     result.forEach(r => {
         console.log('Pokmon har namnet ' + r.name + ' med hp till ' + r.hp);
     });
 });
-*/
+
 
 /*
 connection.select('id', 'name').table('PokemonCards').then((result) => { // SELECT id, name FROM PokemonCards 
@@ -40,13 +40,18 @@ connection.select('id', 'name', 'hp').whereIn('id', [2, 4, 6]).table('PokemonCar
     console.log(result);
 });
 */
-connection('PokemonCards').where('id', 1). select().then((result) => {
+
+// SELECT * FROM PokemonCards WHERE id = 1
+/*
+connection('PokemonCards').where('id', 1).select().then((result) => {
     console.log(result);
 });
-
-
-
-
+*/
+/*
+connection('PokemonCards').insert({ name: 'Nodemon', hp: 163}).finally((result) => {
+    console.log(result);
+});
+*/
 // "Fulhack" för att slippa trycka ctrl-c
 /*
 const s = 1;
