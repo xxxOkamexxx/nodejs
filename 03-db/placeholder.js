@@ -18,7 +18,7 @@ con.connect(function(err) {
     console.log("Anslutit till databasen!! Party party!");
    
     // con.query(sql, placeholder data, callback);
-    /*
+    /* // lägga till pokemon med Array[]
     let sql = "INSERT INTO PokemonCards (name, hp) VALUES (?, ?)";
     let data = [ 'Talonflame', 130 ];
     con.query(sql, data, function(err, result){ 
@@ -28,7 +28,7 @@ con.connect(function(err) {
          console.log(result);
     });
     */
-   /*
+   /* // lägga till pokemon med object{}
    let sql = "INSERT INTO PokemonCards SET ?"// -> INSERT INTO PokemonCards SET name = "Gourgeist", hp = 100;
    let data = {
        name: "Gourgeist",
