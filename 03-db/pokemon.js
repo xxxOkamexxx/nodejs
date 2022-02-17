@@ -38,7 +38,7 @@ function insertPokemonCard(name, hp) {
         console.log('Connected to database!');
 
         let sql = "INSERT INTO PokemonCards (name, hp) VALUES (?, ?)"; // <- SQL fråga 
-        let data = [ name, hp]; // <- Data för placeholders
+        let data = [name, hp]; // <- Data för placeholders
         con.query(sql, data, function(err, result) {
             if (err) throw err;
             console.log('Pokemon Card created');

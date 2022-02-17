@@ -23,7 +23,7 @@ PokemonCards.where(parametrar).fetchAll().then((collection) => {
 */
 
 const attribut = {
-    name: "Skrelp",
+    name: "Skrep",
     hp: 50
 };
 let Skrelp = new PokemonCards(attribut);

@@ -47,11 +47,11 @@ connection('PokemonCards').where('id', 1).select().then((result) => {
     console.log(result);
 });
 */
-/*
+
 connection('PokemonCards').insert({ name: 'Nodemon', hp: 163}).finally((result) => {
     console.log(result);
 });
-*/
+
 // "Fulhack" för att slippa trycka ctrl-c
 /*
 const s = 1;
