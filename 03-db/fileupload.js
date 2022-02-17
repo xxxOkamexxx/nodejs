@@ -2,12 +2,12 @@ const express = require('express');
 const app = express();
 const multer = require('multer');  // Ladda in multer
 
-app.use(express.static('static'));
+app.use(express.static('static')); // file name 'static'
 
 const storageObject = multer.diskStorage(
     {
         destination: (req, file, cb) =>  {
-            cb(null, 'uploads');
+            cb(null, 'uploads'); // file name 'upload'
         },
         filename: (req, file, cb) => {
             const strDate = (new Date()).valueOf().toString();
