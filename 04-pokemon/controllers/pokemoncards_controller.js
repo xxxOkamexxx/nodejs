@@ -1,5 +1,6 @@
-
 const PokemonCards = require('../models/PokemonCards');
+const log = require('debug')('pokemon_cards');
+
 //const models = require('../models');
 
 /*
@@ -28,7 +29,6 @@ const create = async(req, res) => {
         );
     }
 }
-
 /*
  * Read - läs ett eller flera kort från databasen
  */
