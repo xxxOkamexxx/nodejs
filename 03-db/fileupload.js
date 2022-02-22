@@ -3,7 +3,7 @@ const app = express();
 const multer = require('multer');  // Ladda in multer
 const morgan = require('morgan');
 
-app.use(morgan('combined'));
+app.use(morgan('short'));
 app.use(express.static('static')); // file name 'static'
 
 const storageObject = multer.diskStorage(

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node debug",
-    "development": "DEBUG=* nodemon winston"
+    "development": "DEBUG=* nodemon debug"
   },
   "author": "",
   "license": "ISC",
