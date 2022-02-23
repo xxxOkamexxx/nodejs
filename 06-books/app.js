@@ -14,16 +14,16 @@ app.use(express.urlencoded({ extended: false }));
 
 app.post('/test', [
 	body('name').exists().isLength({ min: 3 }),
-    body('adress').optional().isString().trim(),
+	body('address').optional().isString().trim().isLength({ min: 6, max: 42 }),
 ], (req, res) => {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		return res.status(422).send({ status: 'fail', data: errors.array() });
 	}
 
-    const valiDator = matchedData(res);
+	const validData = matchedData(req);
 
-	res.send({ status: 'success', data: valiDator});
+	res.send({ status: 'success', data: validData });
 });
 
 // routes
