@@ -20,7 +20,8 @@ router.get('/books', profileController.getBooks);
 
 /**
  * Add a book to the authenticated user
+ *
  */
-//router.post('/books', profileController.addBook);
+router.post('/books', profileValidationRules.addBookRules, profileController.addBook);
 
 module.exports = router;
