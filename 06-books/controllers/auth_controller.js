@@ -4,6 +4,7 @@
 
  const bcrypt = require('bcrypt');
  const debug = require('debug')('books:auth_controller');
+ const jwt = require('jsonwebtoken');
  const { matchedData, validationResult } = require('express-validator');
  const models = require('../models');
  
@@ -17,10 +18,84 @@
   * }
   */
  const login = async (req, res) => {
-	 // check if a user with the username exists
+	 // destructure username and password from request body
+	 const { username, password } = req.body;
  
+	 // login the user
+	 const user = await models.User.login(username, password);
+	 if (!user) {
+		 return res.status(401).send({
+			 status: 'fail',
+			 data: 'Authentication failed.',
+		 });
+	 }
+ 
+	 // construct jwt payload
+	 const payload = {
+		 sub: user.get('username'),
+		 user_id: user.get('id'),
+		 name: user.get('first_name') + ' ' + user.get('last_name'),
+	 }
+ 
+	 // sign payload and get access-token
+	 const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { 
+		 expiresIn: process.env.ACCESS_TOKEN_LIFETIME || '1h',
+		});
+
+	// Sign 
+	const refresh_token = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { 
+		expiresIn: process.env.REFRESH_TOKEN_LIFETIME || '1w',
+	   });	
+ 
+	 // respond with the access-token
+	 return res.send({
+		 status: 'success',
+		 data: {
+			 access_token,
+			 refresh_token,
+ //			access_token: access_token,
+		 }
+	 });
  }
  
+/**
+ * 
+ */
+const refresh = (req,res) =>{
+	// validate the refresh token (check signature and expiry date)
+	try{
+		// varify 
+		const payload = jwt.verify(req.body.token, process.env.REFRESH_TOKEN_SECRET);
+
+		// construct payload
+		// remove `iat` ``
+		delete payload.iat;
+		delete payload.exp;
+
+		// sign payload and get acssess token
+		const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { 
+			expiresIn: process.env.ACCESS_TOKEN_LIFETIME || '1h',
+		   });
+
+		// send the accsess token to the client
+		return res.send({
+			status: 'success',
+			data: {
+				access_token,				
+			}
+		});
+
+
+	} catch (error){
+		return res.status(401).send({
+			status: 'fail',
+			data:'Invalid token',
+		});
+	}
+	
+}
+
+
  /**
   * Register a new user
   *
@@ -41,7 +116,7 @@
 	 // generate a hash of `validData.password`
 	 // and overwrite `validData.password` with the generated hash
 	 try {
-		 validData.password = await bcrypt.hash(validData.password, 10);
+		 validData.password = await bcrypt.hash(validData.password, models.User.hashSaltRounds);
  
 	 } catch (error) {
 		 res.status(500).send({
@@ -73,5 +148,6 @@
  
  module.exports = {
 	 login,
+	 refresh,
 	 register,
  }

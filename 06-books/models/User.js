@@ -10,6 +10,12 @@
 			 return this.belongsToMany('Book');
 		 }
 	 }, {
+		 hashSaltRounds: 10,
+		
+		 async fetchById(id, fetchOptions = {}) {
+			 return await new this({ id }).fetch(fetchOptions);
+		 },
+ 
 		 async login(username, password) {
 			 // find user based on the username (bail if no such user exists)
 			 const user = await new this({ username }).fetch({ require: false });

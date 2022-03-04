@@ -1,4 +1,2 @@
 node_modules/
-dot.env/
 *.env
-uploads/

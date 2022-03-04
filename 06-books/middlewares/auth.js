@@ -4,6 +4,7 @@
 
  const bcrypt = require('bcrypt');
  const debug = require('debug')('books:auth');
+ const jwt = require('jsonwebtoken');
  const { User } = require('../models');
  
  /**
@@ -62,7 +63,47 @@
      // pass request along
      next();
  }
- 
+
+ /**
+  *  Validate JWT token
+  */
+ const validateJwtToken = (req, res, next) => {
+      // make sure Authorization header exists, otherwise bail
+      if (!req.headers.authorization) {
+        debug("Authorization header missing");
+
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorization required',
+        });
+    }
+    
+    // Authorization:"earer eyJkpXVCJ9.eyJV9.xndmU"
+    // Split authorization header into "authSchema token"
+    const [authSchema, token] = req.headers.authorization.split(' ');
+    if (authSchema.toLowerCase()!== "bearer" ){
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorozation required',
+        });
+    }
+    
+    // verify token (and extract payload)
+    try{
+        req.user  = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        
+    } catch (error){
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorozation faild',
+        });
+    
+    }  
+    // pass request along
+    next();
+}
+
  module.exports = {
      basic,
+     validateJwtToken,
  }

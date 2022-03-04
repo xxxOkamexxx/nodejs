@@ -5,6 +5,7 @@
  const bcrypt = require('bcrypt');
  const debug = require('debug')('books:profile_controller');
  const { matchedData, validationResult } = require('express-validator');
+ const { User } = require('../models');
  
  /**
   * Get authenticated user's profile
@@ -12,12 +13,18 @@
   * GET /
   */
  const getProfile = async (req, res) => {
-	 res.send({
-		 status: 'success',
-		 data: {
-			 user: req.user,
-		 }
-	 });
+	 try{
+		 const user = await User.fetchById(req.user.user_id);
+
+		 res.send({
+			 status:'success',
+			 data:{
+				 user,
+			 }
+		 });
+	 } catch (error) {
+		 return res.sendStatus(404);
+	 }
  }
  
  /**
@@ -38,7 +45,7 @@
 	 // update the user's password, but only if they sent us a new password
 	 if (validData.password) {
 		 try {
-			 validData.password = await bcrypt.hash(validData.password, 10);
+			 validData.password = await bcrypt.hash(validData.password, models.User.hashSaltRounds);
  
 		 } catch (error) {
 			 res.status(500).send({
@@ -50,7 +57,9 @@
 	 }
  
 	 try {
-		 const updatedUser = await req.user.save(validData);
+		 const user = await User.fetchById(req.user.user_id);
+		 
+		 const updatedUser = await user.save(validData);
 		 debug("Updated user successfully: %O", updatedUser);
  
 		 res.send({
@@ -75,17 +84,13 @@
   * GET /books
   */
  const getBooks = async (req, res) => {
-	 // get user and also eager-load the books-relation
-	 // const user = await new models.User({ id: req.user.id })
-	 // 	.fetch({ withRelated: ['books'] });
- 
-	 // "lazy load" the books-relation
-	 await req.user.load('books');
+	 // fetch the user (and eager-load the book-relation)
+	 const user = await User.fetchById(req.user.user_id, { withRelated: ['books']})
  
 	 res.status(200).send({
 		 status: 'success',
 		 data: {
-			 books: req.user.related('books'),
+			 books: user.related('books'),
 		 },
 	 });
  }
@@ -111,11 +116,11 @@
 	 // get only the validated data from the request
 	 const validData = matchedData(req);
  
-	 // lazy-load book relationship
-	 await req.user.load('books');
+	 // fetch user and eager-load books relation
+	 const user = await User.fetchById(req.user.user_id,{ withRelated: ['books']});
  
 	 // get the user's books
-	 const books = req.user.related('books');
+	 const books = user.related('books');
  
 	 // check if book is already in the user's list of books
 	 const existing_book = books.find(book => book.id == validData.book_id);
@@ -129,7 +134,7 @@
 	 }
  
 	 try {
-		 const result = await req.user.books().attach(validData.book_id);
+		 const result = await user.books().attach(validData.book_id);
 		 debug("Added book to user successfully: %O", result);
  
 		 res.send({
