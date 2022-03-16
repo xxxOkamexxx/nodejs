@@ -108,6 +108,13 @@ usernameForm.addEventListener('submit', e => {
 		console.log("Server acknowledged that user joined", status);
 
 		if (status.success) {
+			// render message history
+			const ownMsg = message.username === uresname;
+			status.messages.array.forEach( message, ownMsg );
+
+			};
+	
+
 			// hide start view
 			startEl.classList.add('hide');
 
@@ -123,7 +130,7 @@ usernameForm.addEventListener('submit', e => {
 			// update list of users in room
 			updateUserList(status.users);
 		}
-	});
+	);
 });
 
 // send message to server

@@ -3,7 +3,8 @@
  */
 
  const debug = require('debug')('chat:socket_controller');
-
+ const models = require('../models');
+ 
  let io = null; // socket.io server instance
  
  // list of rooms and their connected users
@@ -48,7 +49,7 @@
  }
  
  // Handle when a user has joined the chat
- const handleUserJoined = function(username, room_id, callback) {
+ const handleUserJoined = async function(username, room_id, callback) {
      debug(`User ${username} with socket id ${this.id} wants to join room '${room_id}'`);
  
      // join room
@@ -63,11 +64,21 @@
  
      // let everyone know that someone has connected to the chat
      this.broadcast.to(room.id).emit('user:connected', username);
- 
+
+    // one hour ago
+    const one_hour_ago = Date.now() - (1000 * 60 * 60);
+
+    // get all messages from DB
+    const messages = await models.Message
+        .find({room:room.id})
+        .where('room').equals(room.id)// same as the abov '.find' - line
+        .where('timestamp').gte(one_hour_ago); // you can chain '.where' and they work as AND 
+
      // confirm join
      callback({
          success: true,
          roomName: room.name,
+         messages,
          users: room.users
      });
  
@@ -75,11 +86,15 @@
      this.broadcast.to(room.id).emit('user:list', room.users);
  }
  
- const handleChatMessage = function(message) {
-     debug('Someone said something: ', message);
+ const handleChatMessage = async function(data) {
+     debug('Someone said something: ', data);
  
      // emit `chat:message` event to everyone EXCEPT the sender
-     this.broadcast.to(message.room).emit('chat:message', message);
+     this.broadcast.to(data.room).emit('chat:message', data);
+ 
+     // save message in database
+     const message = new models.Message(data);
+     await message.save();
  }
  
  module.exports = function(socket, _io) {
