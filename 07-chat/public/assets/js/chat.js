@@ -46,10 +46,27 @@ const addNoticeToChat = notice => {
 	liEl.scrollIntoView();
 }
 
+// get list of rooms from the server
+const getRoomList = () => {
+	console.log("Requesting room list from server...");
+
+	socket.emit('get-room-list', (rooms) => {
+		console.log("Got ourselves a list of rooms from the server!", rooms);
+
+		// render list of rooms in <select> element
+		document.querySelector('#room').innerHTML = rooms
+			.map(room => `<option value="${room.id}">${room.name}</option>`)
+			.join('');
+
+		// allow user to click "Connect!"
+		connectBtn.removeAttribute('disabled');
+	});
+}
+
 // update user list
 const updateUserList = users => {
 	document.querySelector('#online-users').innerHTML =
-		Object.values(users).map(username => `<li>${username}</li>`).join("");
+		Object.values(users).map(username => `<li><span class="fa-solid fa-user-astronaut"></span> ${username}</li>`).join("");
 }
 
 // listen for when a new user connects
@@ -93,6 +110,11 @@ socket.on('chat:message', message => {
 	addMessageToChat(message);
 });
 
+// listen for when a user disconnects
+socket.on('chat:notice', (data) => {
+	addNoticeToChat(data.message);
+});
+
 // get username and room from form and emit `user:joined` and then show chat
 usernameForm.addEventListener('submit', e => {
 	e.preventDefault();
@@ -109,11 +131,10 @@ usernameForm.addEventListener('submit', e => {
 
 		if (status.success) {
 			// render message history
-			const ownMsg = message.username === uresname;
-			status.messages.array.forEach( message, ownMsg );
-
-			};
-	
+			status.messages.forEach(message => {
+				const ownMsg = message.username === username;
+				addMessageToChat(message, ownMsg);
+			});
 
 			// hide start view
 			startEl.classList.add('hide');
@@ -130,7 +151,7 @@ usernameForm.addEventListener('submit', e => {
 			// update list of users in room
 			updateUserList(status.users);
 		}
-	);
+	});
 });
 
 // send message to server
@@ -157,4 +178,10 @@ messageForm.addEventListener('submit', e => {
 	// clear message input element and focus
 	messageEl.value = '';
 	messageEl.focus();
+});
+
+// attach an event listener for when the document has fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+	// get room list from server
+	getRoomList();
 });
